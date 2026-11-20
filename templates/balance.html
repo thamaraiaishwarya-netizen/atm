@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Balance Enquiry | Secure Bank ATM</title>
+
+  <!-- Bootstrap 5 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+  <style>
+    /* =====================================================
+       GLOBAL RESET & BASE
+    ===================================================== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy-darkest : #061A36;
+      --navy-dark    : #0B2D52;
+      --navy         : #123F69;
+      --white        : #FFFFFF;
+      --gold         : #C5A45D;
+      --gold-light   : #E0C98A;
+      --gold-dark    : #9A7A3A;
+      --silver       : #B0BAC9;
+      --silver-light : #D8DDE6;
+      --screen-glow  : rgba(0, 149, 255, 0.18);
+      --chip-color   : #C5A45D;
+    }
+
+    html, body {
+      min-height: 100vh;
+      background: var(--navy-darkest);
+      font-family: 'Rajdhani', sans-serif;
+      color: var(--white);
+      overflow-x: hidden;
+    }
+
+    /* Subtle animated background grid */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(18, 63, 105, 0.25) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(18, 63, 105, 0.25) 1px, transparent 1px);
+      background-size: 40px 40px;
+      animation: gridScroll 20s linear infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @keyframes gridScroll {
+      0%   { background-position: 0 0; }
+      100% { background-position: 40px 40px; }
+    }
+
+    /* =====================================================
+       PAGE WRAPPER
+    ===================================================== */
+    .page-wrapper {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 30px 16px;
+    }
+
+    /* =====================================================
+       ATM MACHINE OUTER SHELL
+    ===================================================== */
+    .atm-machine {
+      width: 100%;
+      max-width: 480px;
+      background: linear-gradient(160deg, #1a2a3f 0%, #0d1e30 40%, #07131f 100%);
+      border-radius: 24px 24px 20px 20px;
+      box-shadow:
+        0 0 0 2px #1e3a5a,
+        0 0 0 5px #0a1e30,
+        0 8px 40px rgba(0, 0, 0, 0.8),
+        0 0 80px rgba(0, 100, 200, 0.12),
+        inset 0 1px 0 rgba(255,255,255,0.06);
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Rivets / screws on corners */
+    .atm-machine::before,
+    .atm-machine::after {
+      content: '';
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #c0c8d4, #5a6472);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.3);
+      top: 14px;
+      z-index: 10;
+    }
+    .atm-machine::before { left: 14px; }
+    .atm-machine::after  { right: 14px; }
+
+    /* =====================================================
+       ATM HEADER
+    ===================================================== */
+    .atm-header {
+      background: linear-gradient(135deg, #0a2240 0%, #061830 50%, #0a2240 100%);
+      border-bottom: 2px solid var(--gold-dark);
+      padding: 20px 28px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .atm-header::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      opacity: 0.6;
+    }
+
+    .bank-logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .bank-logo-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 12px rgba(197,164,93,0.5), inset 0 1px 0 rgba(255,255,255,0.25);
+    }
+
+    .bank-logo-icon i {
+      font-size: 20px;
+      color: var(--navy-darkest);
+    }
+
+    .bank-logo-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1;
+    }
+
+    .bank-name {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .bank-tagline {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 11px;
+      color: var(--silver);
+      letter-spacing: 0.5px;
+      margin-top: 2px;
+    }
+
+    .atm-label-badge {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--navy-darkest);
+      background: linear-gradient(135deg, var(--gold-light), var(--gold-dark));
+      padding: 5px 10px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      box-shadow: 0 2px 8px rgba(197,164,93,0.4);
+    }
+
+    /* =====================================================
+       STATUS BAR
+    ===================================================== */
+    .atm-status-bar {
+      background: rgba(6, 26, 54, 0.9);
+      border-bottom: 1px solid rgba(197,164,93,0.15);
+      padding: 6px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 11px;
+      color: var(--silver);
+      letter-spacing: 0.5px;
+    }
+
+    .status-dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #2ecc71;
+      box-shadow: 0 0 6px #2ecc71;
+      animation: pulse 2s ease-in-out infinite;
+      margin-right: 6px;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.5; transform: scale(0.85); }
+    }
+
+    .atm-clock { color: var(--gold); font-weight: 600; }
+
+    /* =====================================================
+       ATM SCREEN BEZEL
+    ===================================================== */
+    .atm-screen-bezel {
+      background: linear-gradient(180deg, #0d1e2e 0%, #060f1a 100%);
+      padding: 14px 16px;
+      margin: 0;
+    }
+
+    /* =====================================================
+       ATM SCREEN INNER
+    ===================================================== */
+    .atm-screen {
+      background: linear-gradient(160deg, #040e1c 0%, #071525 60%, #050c18 100%);
+      border: 1px solid rgba(0, 120, 220, 0.3);
+      border-radius: 10px;
+      padding: 22px 24px 26px;
+      position: relative;
+      overflow: hidden;
+      box-shadow:
+        inset 0 0 60px rgba(0, 80, 180, 0.08),
+        inset 0 0 2px rgba(0,120,255,0.3),
+        0 0 20px rgba(0, 80, 180, 0.15);
+    }
+
+    /* Scanlines overlay */
+    .atm-screen::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 100, 200, 0.03) 2px,
+        rgba(0, 100, 200, 0.03) 4px
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Screen corner brackets */
+    .screen-corner {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      z-index: 2;
+    }
+    .screen-corner.tl { top: 8px; left: 8px; border-top: 2px solid var(--gold); border-left: 2px solid var(--gold); }
+    .screen-corner.tr { top: 8px; right: 8px; border-top: 2px solid var(--gold); border-right: 2px solid var(--gold); }
+    .screen-corner.bl { bottom: 8px; left: 8px; border-bottom: 2px solid var(--gold); border-left: 2px solid var(--gold); }
+    .screen-corner.br { bottom: 8px; right: 8px; border-bottom: 2px solid var(--gold); border-right: 2px solid var(--gold); }
+
+    .screen-content {
+      position: relative;
+      z-index: 2;
+    }
+
+    /* =====================================================
+       BACK LINK
+    ===================================================== */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--silver);
+      text-decoration: none;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 4px 8px;
+      border: 1px solid rgba(176, 186, 201, 0.2);
+      border-radius: 4px;
+      transition: all 0.25s ease;
+      margin-bottom: 16px;
+    }
+
+    .back-link:hover {
+      color: var(--gold);
+      border-color: rgba(197, 164, 93, 0.5);
+      background: rgba(197, 164, 93, 0.06);
+      text-shadow: 0 0 8px rgba(197,164,93,0.4);
+    }
+
+    /* =====================================================
+       SCREEN TITLE
+    ===================================================== */
+    .screen-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--gold);
+      text-align: center;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      text-shadow: 0 0 14px rgba(197,164,93,0.5);
+      position: relative;
+    }
+
+    .screen-title::after {
+      content: '';
+      display: block;
+      width: 60px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin: 8px auto 0;
+      opacity: 0.6;
+    }
+
+    /* =====================================================
+       ATM CARD — CSS Only
+    ===================================================== */
+    .atm-card {
+      width: 100%;
+      max-width: 340px;
+      height: 190px;
+      border-radius: 14px;
+      margin: 0 auto 22px;
+      position: relative;
+      overflow: hidden;
+      cursor: default;
+      background: linear-gradient(135deg, #0e3060 0%, #1a5490 35%, #0d2c50 60%, #0a2040 100%);
+      box-shadow:
+        0 8px 32px rgba(0,0,0,0.6),
+        0 2px 8px rgba(0,0,0,0.4),
+        inset 0 1px 0 rgba(255,255,255,0.12),
+        0 0 0 1px rgba(197,164,93,0.3);
+      animation: cardFloat 4s ease-in-out infinite;
+    }
+
+    @keyframes cardFloat {
+      0%, 100% { transform: translateY(0px); }
+      50%       { transform: translateY(-3px); }
+    }
+
+    /* Holographic shimmer strip */
+    .atm-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(
+        110deg,
+        transparent 20%,
+        rgba(255,255,255,0.06) 40%,
+        rgba(197,164,93,0.12) 50%,
+        rgba(255,255,255,0.06) 60%,
+        transparent 80%
+      );
+      animation: cardShimmer 3.5s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes cardShimmer {
+      0%   { left: -100%; }
+      100% { left: 180%; }
+    }
+
+    /* EMV Chip */
+    .card-chip {
+      position: absolute;
+      top: 48px;
+      left: 20px;
+      width: 36px;
+      height: 28px;
+      border-radius: 5px;
+      background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 40%, var(--gold-dark) 100%);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.3);
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-rows: 1fr 1fr 1fr;
+      gap: 2px;
+      padding: 4px;
+    }
+
+    .chip-line {
+      background: rgba(155, 120, 50, 0.6);
+      border-radius: 1px;
+    }
+
+    /* Contactless symbol */
+    .card-contactless {
+      position: absolute;
+      top: 48px;
+      right: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+    }
+
+    .contactless-arc {
+      width: 20px;
+      height: 10px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-bottom: none;
+      border-radius: 20px 20px 0 0;
+    }
+    .contactless-arc:nth-child(2) { width: 14px; height: 7px; }
+    .contactless-arc:nth-child(3) { width: 8px;  height: 4px; }
+
+    /* Card number */
+    .card-number {
+      position: absolute;
+      bottom: 50px;
+      left: 20px;
+      right: 20px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      color: rgba(255,255,255,0.90);
+      text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+    }
+
+    /* Bank name top-left */
+    .card-bank-name {
+      position: absolute;
+      top: 16px;
+      left: 20px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--gold-light);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+    }
+
+    /* Network logo top-right */
+    .card-network {
+      position: absolute;
+      top: 14px;
+      right: 18px;
+      display: flex;
+      align-items: center;
+    }
+
+    .network-circle {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      opacity: 0.85;
+    }
+
+    .network-circle.left  { background: #eb001b; margin-right: -8px; }
+    .network-circle.right { background: #f79e1b; }
+
+    /* Cardholder name */
+    .card-holder {
+      position: absolute;
+      bottom: 16px;
+      left: 20px;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.80);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+      max-width: 55%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* DEBIT label + expiry */
+    .card-debit-wrap {
+      position: absolute;
+      bottom: 14px;
+      right: 20px;
+      text-align: right;
+    }
+
+    .card-debit-label {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--gold-light);
+      letter-spacing: 2px;
+      display: block;
+    }
+
+    .card-expiry {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 11px;
+      color: rgba(255,255,255,0.65);
+      letter-spacing: 1px;
+      display: block;
+      margin-top: 2px;
+    }
+
+    /* =====================================================
+       SECTION DIVIDER
+    ===================================================== */
+    .section-divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 16px;
+    }
+
+    .section-divider span {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      color: var(--gold);
+      white-space: nowrap;
+    }
+
+    .section-divider::before,
+    .section-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(197,164,93,0.3));
+    }
+    .section-divider::before { background: linear-gradient(90deg, rgba(197,164,93,0.3), transparent); }
+
+    /* =====================================================
+       ACCOUNT INFO TABLE
+    ===================================================== */
+    .info-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      font-family: 'Rajdhani', sans-serif;
+    }
+
+    .info-table tr {
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      transition: background 0.2s ease;
+    }
+
+    .info-table tr:last-child { border-bottom: none; }
+
+    .info-table tr:hover {
+      background: rgba(197, 164, 93, 0.05);
+    }
+
+    .info-table td {
+      padding: 9px 8px;
+      font-size: 13px;
+      vertical-align: middle;
+    }
+
+    .info-label {
+      color: var(--silver);
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+      width: 42%;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .info-label i {
+      font-size: 13px;
+      color: var(--gold);
+      opacity: 0.75;
+      width: 14px;
+    }
+
+    .info-sep {
+      color: rgba(197,164,93,0.3);
+      text-align: center;
+      width: 20px;
+      font-size: 11px;
+    }
+
+    .info-value {
+      color: var(--white);
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      word-break: break-all;
+    }
+
+    .info-badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 3px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      background: rgba(197,164,93,0.12);
+      border: 1px solid rgba(197,164,93,0.3);
+      color: var(--gold-light);
+    }
+
+    /* =====================================================
+       BALANCE BLOCK
+    ===================================================== */
+    .balance-block {
+      background: linear-gradient(135deg, rgba(197,164,93,0.08) 0%, rgba(197,164,93,0.03) 100%);
+      border: 1px solid rgba(197,164,93,0.3);
+      border-radius: 10px;
+      padding: 20px 16px;
+      text-align: center;
+      margin-bottom: 22px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .balance-block::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(197,164,93,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .balance-label {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .balance-label::before,
+    .balance-label::after {
+      content: '';
+      width: 20px;
+      height: 1px;
+      background: rgba(197,164,93,0.5);
+    }
+
+    .balance-amount {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 32px;
+      font-weight: 900;
+      color: var(--gold);
+      letter-spacing: 2px;
+      line-height: 1.1;
+      animation: screenGlow 2.5s ease-in-out infinite;
+      text-shadow:
+        0 0 10px rgba(197,164,93,0.6),
+        0 0 30px rgba(197,164,93,0.3),
+        0 0 60px rgba(197,164,93,0.15);
+    }
+
+    @keyframes screenGlow {
+      0%, 100% {
+        text-shadow:
+          0 0 10px rgba(197,164,93,0.6),
+          0 0 30px rgba(197,164,93,0.3),
+          0 0 60px rgba(197,164,93,0.15);
+      }
+      50% {
+        text-shadow:
+          0 0 16px rgba(197,164,93,0.9),
+          0 0 50px rgba(197,164,93,0.5),
+          0 0 90px rgba(197,164,93,0.25);
+      }
+    }
+
+    .balance-currency {
+      font-size: 18px;
+      font-weight: 700;
+      vertical-align: middle;
+      margin-right: 4px;
+    }
+
+    .balance-updated {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 11px;
+      color: rgba(176,186,201,0.6);
+      margin-top: 10px;
+      letter-spacing: 0.5px;
+    }
+
+    .balance-updated i { font-size: 10px; margin-right: 3px; }
+
+    /* =====================================================
+       BTN-ATM
+    ===================================================== */
+    .btn-atm {
+      display: block;
+      width: 100%;
+      padding: 13px 20px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-align: center;
+      text-decoration: none;
+      text-transform: uppercase;
+      color: var(--navy-darkest);
+      background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 50%, var(--gold-dark) 100%);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      box-shadow:
+        0 4px 20px rgba(197,164,93,0.35),
+        0 2px 6px rgba(0,0,0,0.4),
+        inset 0 1px 0 rgba(255,255,255,0.3);
+      transition: all 0.3s ease;
+      margin-bottom: 16px;
+    }
+
+    .btn-atm::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .btn-atm:hover {
+      color: var(--navy-darkest);
+      background: linear-gradient(135deg, #f0d898 0%, var(--gold-light) 50%, var(--gold) 100%);
+      box-shadow:
+        0 6px 30px rgba(197,164,93,0.55),
+        0 2px 8px rgba(0,0,0,0.4),
+        inset 0 1px 0 rgba(255,255,255,0.4);
+      transform: translateY(-1px);
+      text-decoration: none;
+    }
+
+    .btn-atm:hover::before { left: 100%; }
+
+    .btn-atm:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 10px rgba(197,164,93,0.35);
+    }
+
+    .btn-atm i { font-size: 13px; vertical-align: middle; margin-right: 6px; }
+
+    /* =====================================================
+       FLASH MESSAGES
+    ===================================================== */
+    .flash-messages {
+      margin-top: 4px;
+    }
+
+    .flash-alert {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      border-radius: 6px;
+      padding: 10px 14px;
+      margin-bottom: 10px;
+      border: none;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .flash-alert i { margin-top: 1px; flex-shrink: 0; }
+
+    .flash-success {
+      background: rgba(46, 204, 113, 0.12);
+      border: 1px solid rgba(46, 204, 113, 0.35);
+      color: #6edd9e;
+    }
+
+    .flash-danger {
+      background: rgba(231, 76, 60, 0.12);
+      border: 1px solid rgba(231, 76, 60, 0.35);
+      color: #f1948a;
+    }
+
+    .flash-info {
+      background: rgba(52, 152, 219, 0.12);
+      border: 1px solid rgba(52, 152, 219, 0.35);
+      color: #7fb9d9;
+    }
+
+    .flash-warning {
+      background: rgba(197, 164, 93, 0.12);
+      border: 1px solid rgba(197, 164, 93, 0.35);
+      color: var(--gold-light);
+    }
+
+    /* =====================================================
+       ATM FOOTER STRIP
+    ===================================================== */
+    .atm-footer-strip {
+      background: linear-gradient(90deg, #07111c, #0d1e30, #07111c);
+      border-top: 2px solid var(--gold-dark);
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .atm-footer-strip::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      opacity: 0.4;
+    }
+
+    .footer-secure {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 11px;
+      color: var(--silver);
+      letter-spacing: 0.5px;
+    }
+
+    .footer-secure i { color: var(--gold); font-size: 12px; }
+
+    .footer-brand {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 8px;
+      font-weight: 700;
+      color: rgba(197,164,93,0.5);
+      letter-spacing: 2px;
+    }
+
+    /* =====================================================
+       UTILITY
+    ===================================================== */
+    .fade-in {
+      animation: fadeInUp 0.5s ease both;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 520px) {
+      .atm-screen { padding: 18px 16px 22px; }
+      .balance-amount { font-size: 26px; }
+      .screen-title  { font-size: 13px; letter-spacing: 2px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="page-wrapper">
+  <div class="atm-machine fade-in">
+
+    <!-- ═══════════════════ HEADER ═══════════════════ -->
+    <div class="atm-header">
+      <div class="bank-logo-wrap">
+        <div class="bank-logo-icon">
+          <i class="bi bi-bank2"></i>
+        </div>
+        <div class="bank-logo-text">
+          <span class="bank-name">Secure Bank</span>
+          <span class="bank-tagline">Trusted Since 1984</span>
+        </div>
+      </div>
+      <div class="atm-label-badge">ATM</div>
+    </div>
+
+    <!-- ═══════════════════ STATUS BAR ═══════════════════ -->
+    <div class="atm-status-bar">
+      <span><span class="status-dot"></span>SYSTEM ONLINE</span>
+      <span class="atm-clock" id="atmClock">--:--:--</span>
+      <span><i class="bi bi-shield-lock-fill" style="color:var(--gold);font-size:11px;"></i>&nbsp;ENCRYPTED</span>
+    </div>
+
+    <!-- ═══════════════════ SCREEN BEZEL ═══════════════════ -->
+    <div class="atm-screen-bezel">
+      <div class="atm-screen">
+
+        <!-- Corner brackets -->
+        <div class="screen-corner tl"></div>
+        <div class="screen-corner tr"></div>
+        <div class="screen-corner bl"></div>
+        <div class="screen-corner br"></div>
+
+        <div class="screen-content">
+
+          <!-- Back Link -->
+          <a href="/dashboard" class="back-link">
+            <i class="bi bi-chevron-left"></i> Main Menu
+          </a>
+
+          <!-- Page Title -->
+          <div class="screen-title">Balance Enquiry</div>
+
+          <!-- ─── ATM CARD ─── -->
+          <div class="atm-card">
+            <!-- Bank name -->
+            <div class="card-bank-name">Secure Bank</div>
+
+            <!-- Network logo -->
+            <div class="card-network">
+              <div class="network-circle left"></div>
+              <div class="network-circle right"></div>
+            </div>
+
+            <!-- EMV Chip -->
+            <div class="card-chip">
+              <div class="chip-line"></div><div class="chip-line"></div><div class="chip-line"></div>
+              <div class="chip-line"></div><div class="chip-line"></div><div class="chip-line"></div>
+              <div class="chip-line"></div><div class="chip-line"></div><div class="chip-line"></div>
+            </div>
+
+            <!-- Contactless -->
+            <div class="card-contactless">
+              <div class="contactless-arc"></div>
+              <div class="contactless-arc"></div>
+              <div class="contactless-arc"></div>
+            </div>
+
+            <!-- Card Number -->
+            <div class="card-number">{{ masked_card }}</div>
+
+            <!-- Cardholder -->
+            <div class="card-holder">{{ customer_name }}</div>
+
+            <!-- Debit + Expiry -->
+            <div class="card-debit-wrap">
+              <span class="card-debit-label">DEBIT</span>
+              <span class="card-expiry">VALID THRU &nbsp;••/••</span>
+            </div>
+          </div>
+          <!-- end .atm-card -->
+
+          <!-- ─── SECTION DIVIDER ─── -->
+          <div class="section-divider">
+            <span>ACCOUNT DETAILS</span>
+          </div>
+
+          <!-- ─── ACCOUNT INFO TABLE ─── -->
+          <table class="info-table">
+            <tbody>
+              <tr>
+                <td>
+                  <span class="info-label">
+                    <i class="bi bi-person-fill"></i> Customer Name
+                  </span>
+                </td>
+                <td class="info-sep">│</td>
+                <td class="info-value">{{ customer_name }}</td>
+              </tr>
+              <tr>
+                <td>
+                  <span class="info-label">
+                    <i class="bi bi-123"></i> Account Number
+                  </span>
+                </td>
+                <td class="info-sep">│</td>
+                <td class="info-value" style="font-family:'Orbitron',sans-serif;font-size:12px;letter-spacing:1px;">
+                  {{ masked_account }}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <span class="info-label">
+                    <i class="bi bi-wallet2"></i> Account Type
+                  </span>
+                </td>
+                <td class="info-sep">│</td>
+                <td class="info-value">
+                  <span class="info-badge">{{ account_type }}</span>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <span class="info-label">
+                    <i class="bi bi-credit-card-2-front"></i> Card Number
+                  </span>
+                </td>
+                <td class="info-sep">│</td>
+                <td class="info-value" style="font-family:'Orbitron',sans-serif;font-size:12px;letter-spacing:1px;">
+                  {{ masked_card }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- ─── BALANCE BLOCK ─── -->
+          <div class="balance-block">
+            <div class="balance-label">Available Balance</div>
+            <div class="balance-amount screenGlow">
+              <span class="balance-currency">Rs.</span>{{ balance }}
+            </div>
+            <div class="balance-updated">
+              <i class="bi bi-clock-history"></i>
+              Balance as of <span id="balanceTimestamp">--</span>
+            </div>
+          </div>
+
+          <!-- ─── RETURN BUTTON ─── -->
+          <a href="/dashboard" class="btn-atm">
+            <i class="bi bi-house-door-fill"></i>
+            Return to Main Menu
+          </a>
+
+          <!-- ─── FLASH MESSAGES ─── -->
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              <div class="flash-messages">
+                {% for category, message in messages %}
+                  <div class="flash-alert flash-{{ category }} alert-dismissible" role="alert">
+                    {% if category == 'success' %}
+                      <i class="bi bi-check-circle-fill"></i>
+                    {% elif category == 'danger' %}
+                      <i class="bi bi-exclamation-triangle-fill"></i>
+                    {% elif category == 'warning' %}
+                      <i class="bi bi-exclamation-circle-fill"></i>
+                    {% else %}
+                      <i class="bi bi-info-circle-fill"></i>
+                    {% endif %}
+                    <span>{{ message }}</span>
+                    <button type="button" class="btn-close btn-close-white ms-auto"
+                            data-bs-dismiss="alert" aria-label="Close"
+                            style="filter:brightness(0.7);padding:0 0 0 12px;background-size:10px;"></button>
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+          {% endwith %}
+
+        </div><!-- end .screen-content -->
+      </div><!-- end .atm-screen -->
+    </div><!-- end .atm-screen-bezel -->
+
+    <!-- ═══════════════════ FOOTER STRIP ═══════════════════ -->
+    <div class="atm-footer-strip">
+      <span class="footer-secure">
+        <i class="bi bi-shield-check"></i>
+        256-bit SSL Secured
+      </span>
+      <span class="footer-brand">SECURE BANK &copy; 2026</span>
+    </div>
+
+  </div><!-- end .atm-machine -->
+</div><!-- end .page-wrapper -->
+
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  /* ── Live clock ── */
+  (function updateClock() {
+    const el = document.getElementById('atmClock');
+    if (el) {
+      const now = new Date();
+      el.textContent = now.toLocaleTimeString('en-IN', { hour12: false });
+    }
+    setTimeout(updateClock, 1000);
+  })();
+
+  /* ── Balance timestamp ── */
+  (function setBalanceTime() {
+    const el = document.getElementById('balanceTimestamp');
+    if (el) {
+      const now = new Date();
+      el.textContent = now.toLocaleString('en-IN', {
+        day: '2-digit', month: 'short', year: 'numeric',
+        hour: '2-digit', minute: '2-digit', hour12: true
+      });
+    }
+  })();
+
+  /* ── Auto-dismiss flash messages after 5 s ── */
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.flash-alert').forEach(function (el) {
+      setTimeout(function () {
+        var bsAlert = bootstrap.Alert.getOrCreateInstance(el);
+        if (bsAlert) bsAlert.close();
+      }, 5000);
+    });
+  });
+</script>
+
+</body>
+</html>

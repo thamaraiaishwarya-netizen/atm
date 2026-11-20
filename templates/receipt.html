@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Transaction Receipt – Secure Bank ATM</title>
+
+  <!-- Bootstrap 5 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+
+  <style>
+    /* ═══════════════════════════════════════
+       ROOT / GLOBAL
+    ═══════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy-darkest : #061A36;
+      --navy-dark    : #0B2D52;
+      --navy         : #123F69;
+      --white        : #FFFFFF;
+      --gold         : #C5A45D;
+      --gold-light   : #d4b97a;
+      --green-glow   : #00e676;
+      --green-soft   : #1de9b6;
+      --screen-glow  : rgba(18, 63, 105, 0.55);
+      --silver       : #c0cdd9;
+      --silver-dark  : #8fa3b3;
+    }
+
+    html, body {
+      min-height: 100vh;
+      background: radial-gradient(ellipse at 30% 20%, #0d2645 0%, var(--navy-darkest) 70%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Rajdhani', sans-serif;
+      color: var(--white);
+      padding: 2rem 1rem;
+    }
+
+    /* ═══════════════════════════════════════
+       ATM MACHINE SHELL
+    ═══════════════════════════════════════ */
+    .atm-machine {
+      width: 100%;
+      max-width: 480px;
+      background: linear-gradient(175deg, #1a2e44 0%, var(--navy-dark) 40%, #07192e 100%);
+      border-radius: 24px 24px 32px 32px;
+      box-shadow:
+        0 0 0 2px var(--silver-dark),
+        0 0 0 4px #2a3f54,
+        0 32px 80px rgba(0,0,0,0.75),
+        inset 0 1px 0 rgba(255,255,255,0.08);
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Subtle rivets on the shell */
+    .atm-machine::before,
+    .atm-machine::after {
+      content: '';
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, var(--silver), #4a6070);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.6);
+      top: 18px;
+    }
+    .atm-machine::before { left: 18px; }
+    .atm-machine::after  { right: 18px; }
+
+    /* ═══════════════════════════════════════
+       ATM HEADER
+    ═══════════════════════════════════════ */
+    .atm-header {
+      background: linear-gradient(135deg, #0a2240 0%, var(--navy-dark) 50%, #07192e 100%);
+      border-bottom: 2px solid var(--gold);
+      padding: 1.4rem 1.5rem 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.85rem;
+      position: relative;
+    }
+
+    .atm-header::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 10%;
+      width: 80%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold-light), transparent);
+    }
+
+    .bank-logo {
+      width: 42px;
+      height: 42px;
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 50%, #a8894a 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 14px rgba(197,164,93,0.5), 0 2px 6px rgba(0,0,0,0.5);
+      flex-shrink: 0;
+    }
+
+    .bank-logo i {
+      font-size: 1.25rem;
+      color: var(--navy-darkest);
+    }
+
+    .header-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+    }
+
+    .header-text .bank-name {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 2px;
+      text-shadow: 0 0 10px rgba(197,164,93,0.4);
+    }
+
+    .header-text .atm-label {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.55rem;
+      font-weight: 400;
+      color: var(--silver-dark);
+      letter-spacing: 3px;
+    }
+
+    /* ═══════════════════════════════════════
+       ATM SCREEN BEZEL
+    ═══════════════════════════════════════ */
+    .screen-bezel {
+      background: linear-gradient(to bottom, #0d1f33, #091827);
+      padding: 14px 16px;
+    }
+
+    /* ═══════════════════════════════════════
+       ATM SCREEN
+    ═══════════════════════════════════════ */
+    .atm-screen {
+      background: linear-gradient(160deg, #061829 0%, #04121f 60%, #061a2e 100%);
+      border-radius: 10px;
+      border: 2px solid #1a3a5c;
+      box-shadow:
+        0 0 0 1px #0d2540,
+        inset 0 0 40px rgba(6,24,60,0.6),
+        0 0 30px rgba(18,63,105,0.3),
+        inset 0 0 2px rgba(100,160,220,0.15);
+      padding: 1.6rem 1.4rem 1.4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Scanline overlay */
+    .atm-screen::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.04) 2px,
+        rgba(0,0,0,0.04) 4px
+      );
+      pointer-events: none;
+      border-radius: 8px;
+      z-index: 1;
+    }
+
+    /* Screen corner glow */
+    .atm-screen::after {
+      content: '';
+      position: absolute;
+      top: -40px;
+      left: -40px;
+      width: 120px;
+      height: 120px;
+      background: radial-gradient(circle, rgba(0,230,118,0.06) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .screen-content {
+      position: relative;
+      z-index: 2;
+    }
+
+    /* ═══════════════════════════════════════
+       SUCCESS ICON
+    ═══════════════════════════════════════ */
+    @keyframes successPulse {
+      0%   { transform: scale(0.7); opacity: 0; filter: drop-shadow(0 0 0px #00e676); }
+      50%  { transform: scale(1.15); opacity: 1; filter: drop-shadow(0 0 18px #00e676); }
+      70%  { transform: scale(0.95); }
+      85%  { transform: scale(1.05); }
+      100% { transform: scale(1);    opacity: 1; filter: drop-shadow(0 0 10px #00e676); }
+    }
+
+    @keyframes glowPulse {
+      0%, 100% { filter: drop-shadow(0 0 8px var(--green-glow));  }
+      50%       { filter: drop-shadow(0 0 22px var(--green-glow)); }
+    }
+
+    .success-icon {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 0.9rem;
+    }
+
+    .success-icon i.fa-check-circle {
+      font-size: 3rem;
+      color: var(--green-glow);
+      animation: successPulse 0.7s ease forwards, glowPulse 2.5s ease-in-out 0.7s infinite;
+    }
+
+    /* ═══════════════════════════════════════
+       TITLE
+    ═══════════════════════════════════════ */
+    .screen-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--green-glow);
+      text-align: center;
+      letter-spacing: 2.5px;
+      text-shadow: 0 0 14px rgba(0,230,118,0.5);
+      margin-bottom: 1.3rem;
+    }
+
+    /* ═══════════════════════════════════════
+       TRANSACTION RECEIPT
+    ═══════════════════════════════════════ */
+    .transaction-receipt {
+      background: linear-gradient(160deg, #07182a 0%, #05121f 100%);
+      border-top: 2px dotted rgba(197,164,93,0.5);
+      border-bottom: 2px dotted rgba(197,164,93,0.5);
+      border-radius: 6px;
+      padding: 1.1rem 1.15rem 1rem;
+      margin-bottom: 1.3rem;
+      position: relative;
+    }
+
+    /* Perforation circles left & right */
+    .transaction-receipt::before,
+    .transaction-receipt::after {
+      content: '';
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      background: #04121f;
+      border-radius: 50%;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 1px solid rgba(197,164,93,0.2);
+    }
+    .transaction-receipt::before { left: -7px; }
+    .transaction-receipt::after  { right: -7px; }
+
+    .receipt-bank-name {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--gold);
+      text-align: center;
+      letter-spacing: 3px;
+      margin-bottom: 1rem;
+      text-shadow: 0 0 10px rgba(197,164,93,0.35);
+    }
+
+    .receipt-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.5rem;
+      padding: 0.32rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .receipt-row:last-of-type {
+      border-bottom: none;
+    }
+
+    .receipt-label {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.55rem;
+      font-weight: 600;
+      color: var(--silver-dark);
+      letter-spacing: 1.5px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      padding-top: 1px;
+    }
+
+    .receipt-value {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--white);
+      text-align: right;
+      word-break: break-all;
+    }
+
+    .receipt-value.amount-value {
+      color: var(--green-glow);
+      font-weight: 700;
+      font-size: 1rem;
+      text-shadow: 0 0 8px rgba(0,230,118,0.3);
+    }
+
+    .receipt-value.balance-value {
+      color: var(--gold-light);
+      font-weight: 700;
+    }
+
+    .receipt-separator {
+      border: none;
+      border-top: 1px dashed rgba(197,164,93,0.35);
+      margin: 0.75rem 0;
+    }
+
+    .receipt-thank-you {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: var(--gold);
+      text-align: center;
+      letter-spacing: 1.5px;
+      text-shadow: 0 0 8px rgba(197,164,93,0.3);
+      padding-top: 0.1rem;
+    }
+
+    /* ═══════════════════════════════════════
+       BUTTONS
+    ═══════════════════════════════════════ */
+    .btn-atm {
+      display: block;
+      width: 100%;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-decoration: none;
+      text-align: center;
+      padding: 0.7rem 1rem;
+      border-radius: 6px;
+      border: 1.5px solid var(--gold);
+      background: linear-gradient(135deg, #1a4a7a 0%, var(--navy) 50%, #0d3357 100%);
+      color: var(--gold);
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: 0 0 10px rgba(197,164,93,0.15), inset 0 1px 0 rgba(255,255,255,0.07);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-atm::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+      transition: left 0.4s ease;
+    }
+
+    .btn-atm:hover::before { left: 100%; }
+
+    .btn-atm:hover {
+      background: linear-gradient(135deg, #2060a0 0%, #1a5490 100%);
+      border-color: var(--gold-light);
+      color: var(--white);
+      box-shadow: 0 0 20px rgba(197,164,93,0.35), 0 4px 15px rgba(0,0,0,0.4);
+      transform: translateY(-1px);
+    }
+
+    .btn-atm:active { transform: translateY(0); }
+
+    .btn-atm-secondary {
+      display: block;
+      width: 100%;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-decoration: none;
+      text-align: center;
+      padding: 0.7rem 1rem;
+      border-radius: 6px;
+      border: 1.5px solid rgba(197,164,93,0.35);
+      background: rgba(6,26,54,0.6);
+      color: var(--silver-dark);
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+
+    .btn-atm-secondary:hover {
+      border-color: rgba(197,164,93,0.6);
+      color: var(--gold-light);
+      background: rgba(11,45,82,0.7);
+      box-shadow: 0 0 12px rgba(197,164,93,0.15);
+      transform: translateY(-1px);
+    }
+
+    .btn-atm-secondary:active { transform: translateY(0); }
+
+    .btn-group-atm {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      margin-top: 0.3rem;
+    }
+
+    /* ═══════════════════════════════════════
+       FLASH MESSAGES
+    ═══════════════════════════════════════ */
+    .flash-container {
+      margin-top: 1rem;
+    }
+
+    .alert-atm {
+      border-radius: 6px;
+      padding: 0.6rem 0.9rem;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      border: 1px solid;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .alert-atm.success {
+      background: rgba(0,230,118,0.08);
+      border-color: rgba(0,230,118,0.3);
+      color: var(--green-glow);
+    }
+
+    .alert-atm.danger {
+      background: rgba(255,71,87,0.08);
+      border-color: rgba(255,71,87,0.35);
+      color: #ff4757;
+    }
+
+    .alert-atm.info {
+      background: rgba(18,63,105,0.3);
+      border-color: rgba(18,63,105,0.6);
+      color: #89c4e1;
+    }
+
+    .alert-atm.warning {
+      background: rgba(197,164,93,0.1);
+      border-color: rgba(197,164,93,0.4);
+      color: var(--gold-light);
+    }
+
+    /* ═══════════════════════════════════════
+       ATM FOOTER STRIP
+    ═══════════════════════════════════════ */
+    .atm-footer-strip {
+      background: linear-gradient(to right, #05101d, #0a1e32, #05101d);
+      border-top: 1px solid rgba(197,164,93,0.2);
+      padding: 0.6rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-led {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .led-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green-glow);
+      box-shadow: 0 0 6px var(--green-glow);
+      animation: ledBlink 2s ease-in-out infinite;
+    }
+
+    @keyframes ledBlink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.3; }
+    }
+
+    .footer-led span {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.45rem;
+      letter-spacing: 1.5px;
+      color: var(--silver-dark);
+    }
+
+    .footer-secure {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.45rem;
+      letter-spacing: 1.5px;
+      color: rgba(197,164,93,0.4);
+    }
+
+    /* ═══════════════════════════════════════
+       RECEIPT ENTRY ANIMATION
+    ═══════════════════════════════════════ */
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .screen-content > * {
+      animation: fadeSlideUp 0.5s ease both;
+    }
+
+    .screen-content > *:nth-child(1) { animation-delay: 0.05s; }
+    .screen-content > *:nth-child(2) { animation-delay: 0.15s; }
+    .screen-content > *:nth-child(3) { animation-delay: 0.25s; }
+    .screen-content > *:nth-child(4) { animation-delay: 0.38s; }
+    .screen-content > *:nth-child(5) { animation-delay: 0.50s; }
+
+    /* ═══════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════ */
+    @media (max-width: 520px) {
+      body { padding: 1rem 0.5rem; }
+      .atm-screen { padding: 1.2rem 1rem; }
+      .receipt-label { font-size: 0.5rem; }
+      .receipt-value { font-size: 0.88rem; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ═══════════════ ATM MACHINE ═══════════════ -->
+  <div class="atm-machine">
+
+    <!-- HEADER -->
+    <div class="atm-header">
+      <div class="bank-logo">
+        <i class="fas fa-landmark"></i>
+      </div>
+      <div class="header-text">
+        <span class="bank-name">SECURE BANK</span>
+        <span class="atm-label">AUTOMATED TELLER MACHINE</span>
+      </div>
+    </div>
+
+    <!-- SCREEN BEZEL -->
+    <div class="screen-bezel">
+
+      <!-- SCREEN -->
+      <div class="atm-screen">
+        <div class="screen-content">
+
+          <!-- Success Icon -->
+          <div class="success-icon">
+            <i class="fas fa-check-circle"></i>
+          </div>
+
+          <!-- Title -->
+          <p class="screen-title">TRANSACTION SUCCESSFUL</p>
+
+          <!-- Receipt Card -->
+          <div class="transaction-receipt">
+
+            <!-- Receipt Header -->
+            <p class="receipt-bank-name">✦ SECURE BANK ✦</p>
+
+            <!-- Rows -->
+            <div class="receipt-row">
+              <span class="receipt-label">TRANS ID</span>
+              <span class="receipt-value">{{ transaction_id }}</span>
+            </div>
+
+            <div class="receipt-row">
+              <span class="receipt-label">TYPE</span>
+              <span class="receipt-value">{{ transaction_type }}</span>
+            </div>
+
+            <div class="receipt-row">
+              <span class="receipt-label">AMOUNT</span>
+              <span class="receipt-value amount-value">Rs. {{ amount }}</span>
+            </div>
+
+            <div class="receipt-row">
+              <span class="receipt-label">BALANCE LEFT</span>
+              <span class="receipt-value balance-value">Rs. {{ remaining_balance }}</span>
+            </div>
+
+            <div class="receipt-row">
+              <span class="receipt-label">DATE &amp; TIME</span>
+              <span class="receipt-value">{{ transaction_date }}</span>
+            </div>
+
+            <div class="receipt-row">
+              <span class="receipt-label">CARD</span>
+              <span class="receipt-value">{{ masked_card }}</span>
+            </div>
+
+            <!-- Separator -->
+            <hr class="receipt-separator"/>
+
+            <!-- Thank you -->
+            <p class="receipt-thank-you">Thank you, {{ customer_name }}!</p>
+
+          </div>
+          <!-- /transaction-receipt -->
+
+          <!-- Action Buttons -->
+          <div class="btn-group-atm">
+            <a href="/dashboard" class="btn-atm">
+              <i class="fas fa-sync-alt me-2"></i>ANOTHER TRANSACTION
+            </a>
+            <a href="/logout" class="btn-atm-secondary">
+              <i class="fas fa-power-off me-2"></i>EXIT
+            </a>
+          </div>
+
+          <!-- Flash Messages -->
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              <div class="flash-container">
+                {% for category, message in messages %}
+                  <div class="alert-atm {{ category }}">
+                    {% if category == 'success' %}
+                      <i class="fas fa-check-circle"></i>
+                    {% elif category == 'danger' %}
+                      <i class="fas fa-exclamation-circle"></i>
+                    {% elif category == 'warning' %}
+                      <i class="fas fa-exclamation-triangle"></i>
+                    {% else %}
+                      <i class="fas fa-info-circle"></i>
+                    {% endif %}
+                    {{ message }}
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+          {% endwith %}
+
+        </div>
+        <!-- /screen-content -->
+      </div>
+      <!-- /atm-screen -->
+
+    </div>
+    <!-- /screen-bezel -->
+
+    <!-- FOOTER STRIP -->
+    <div class="atm-footer-strip">
+      <div class="footer-led">
+        <div class="led-dot"></div>
+        <span>SYSTEM ONLINE</span>
+      </div>
+      <span class="footer-secure">256-BIT ENCRYPTED</span>
+    </div>
+
+  </div>
+  <!-- /atm-machine -->
+
+  <!-- Bootstrap 5 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

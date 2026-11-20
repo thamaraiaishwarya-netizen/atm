@@ -1,0 +1,687 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Secure Bank ATM — Login</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/atm.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #061A36;
+            background-image:
+                radial-gradient(ellipse at 20% 50%, rgba(18,63,105,.35), transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(11,45,82,.4), transparent 55%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Rajdhani', sans-serif;
+            padding: 24px 16px;
+            overflow-x: hidden;
+        }
+
+        .atm-machine {
+            width: 100%;
+            max-width: 480px;
+            background: linear-gradient(175deg,#1a2a3a,#0d1f30 40%,#0a1826);
+            border-radius: 24px 24px 32px 32px;
+            border: 1px solid rgba(197,164,93,.25);
+            box-shadow:
+                0 0 40px rgba(0,100,200,.18),
+                0 30px 80px rgba(0,0,0,.7),
+                inset 0 1px 0 rgba(255,255,255,.08);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .atm-machine::before,
+        .atm-machine::after {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #2a3f55;
+            border: 1px solid rgba(197,164,93,.3);
+            top: 14px;
+        }
+
+        .atm-machine::before { left: 14px; }
+        .atm-machine::after { right: 14px; }
+
+        .atm-header {
+            background: linear-gradient(135deg,#0B2D52,#0a2440,#061A36);
+            border-bottom: 2px solid rgba(197,164,93,.4);
+            padding: 22px 28px 18px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .bank-logo-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .bank-logo-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg,#C5A45D,#a8893e,#C5A45D);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #061A36;
+            box-shadow: 0 0 14px rgba(197,164,93,.5);
+        }
+
+        .bank-name {
+            font-family: 'Orbitron',sans-serif;
+            font-size: 1.45rem;
+            font-weight: 700;
+            color: #C5A45D;
+            letter-spacing: 3px;
+            text-shadow: 0 0 18px rgba(197,164,93,.45);
+        }
+
+        .bank-tagline {
+            font-size: .72rem;
+            color: rgba(197,164,93,.6);
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+        }
+
+        .atm-status-bar {
+            background: #050e1a;
+            border-bottom: 1px solid rgba(18,63,105,.6);
+            padding: 5px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .status-led {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Orbitron',sans-serif;
+            font-size: .6rem;
+            color: rgba(255,255,255,.4);
+        }
+
+        .led-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #00e676;
+            box-shadow: 0 0 6px #00e676;
+            animation: ledPulse 2s infinite;
+        }
+
+        @keyframes ledPulse {
+            50% { opacity: .4; }
+        }
+
+        .status-time {
+            font-family: 'Orbitron',sans-serif;
+            font-size: .6rem;
+            color: rgba(255,255,255,.35);
+        }
+
+        .atm-screen {
+            background: linear-gradient(180deg,#071624,#040f1a);
+            border: 2px solid #123F69;
+            border-radius: 10px;
+            margin: 18px 20px;
+            padding: 24px 22px 20px;
+            box-shadow:
+                0 0 30px rgba(18,100,200,.2),
+                inset 0 0 60px rgba(0,30,70,.5);
+        }
+
+        .screen-title {
+            font-family: 'Orbitron',sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            text-align: center;
+            letter-spacing: 6px;
+            text-shadow: 0 0 20px rgba(100,180,255,.6);
+        }
+
+        .screen-subtitle {
+            font-family: 'Orbitron',sans-serif;
+            font-size: .62rem;
+            color: rgba(100,180,255,.65);
+            text-align: center;
+            letter-spacing: 2.5px;
+            margin-bottom: 22px;
+        }
+
+        .screen-divider {
+            height: 1px;
+            background: linear-gradient(90deg,transparent,rgba(197,164,93,.4),transparent);
+            margin-bottom: 20px;
+        }
+
+        .atm-label {
+            font-family: 'Orbitron',sans-serif;
+            font-size: .6rem;
+            font-weight: 600;
+            color: #C5A45D;
+            letter-spacing: 2.5px;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .input-atm-wrap {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(197,164,93,.6);
+            font-size: .95rem;
+            pointer-events: none;
+        }
+
+        .form-control-atm {
+            width: 100%;
+            background: rgba(6,26,54,.8);
+            border: 1px solid rgba(18,63,105,.8);
+            border-radius: 8px;
+            color: white;
+            font-family: 'Orbitron',sans-serif;
+            font-size: .88rem;
+            letter-spacing: 2px;
+            padding: 12px 14px 12px 42px;
+            outline: none;
+            transition: .25s;
+        }
+
+        .form-control-atm::placeholder {
+            color: rgba(255,255,255,.3);
+            font-size: .7rem;
+        }
+
+        .form-control-atm:focus {
+            border-color: rgba(197,164,93,.7);
+            background: rgba(6,26,54,.95);
+            box-shadow: 0 0 0 3px rgba(197,164,93,.12);
+        }
+
+        .alert-atm {
+            border-radius: 7px;
+            padding: 10px 14px;
+            margin-bottom: 14px;
+            font-size: .9rem;
+            border-left: 3px solid;
+        }
+
+        .alert-danger,
+        .alert-error {
+            background: rgba(180,30,30,.18);
+            border-color: #e53935;
+            color: #ff8a80;
+        }
+
+        .alert-success {
+            background: rgba(20,120,60,.18);
+            border-color: #43a047;
+            color: #69f0ae;
+        }
+
+        .alert-warning {
+            background: rgba(180,120,20,.18);
+            border-color: #C5A45D;
+            color: #ffe082;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .btn-atm {
+            flex: 1;
+            background: linear-gradient(135deg,#C5A45D,#a8893e,#C5A45D);
+            border: none;
+            border-radius: 8px;
+            color: #061A36;
+            font-family: 'Orbitron',sans-serif;
+            font-size: .72rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            padding: 13px 10px;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .btn-atm:hover {
+            filter: brightness(1.1);
+            box-shadow: 0 6px 22px rgba(197,164,93,.45);
+        }
+
+        .btn-atm-secondary {
+            flex: 1;
+            background: transparent;
+            border: 1px solid rgba(100,150,220,.4);
+            border-radius: 8px;
+            color: rgba(200,220,255,.7);
+            font-family: 'Orbitron',sans-serif;
+            font-size: .72rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            padding: 13px 10px;
+            cursor: pointer;
+        }
+
+        .btn-atm-secondary:hover {
+            border-color: #C5A45D;
+            color: #C5A45D;
+        }
+
+        /* Virtual ATM Keypad */
+
+        .keypad-title {
+            font-family: 'Orbitron', sans-serif;
+            color: rgba(197,164,93,.8);
+            font-size: .62rem;
+            letter-spacing: 2px;
+            text-align: center;
+            margin: 5px 0 12px;
+        }
+
+        .atm-keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 9px;
+            margin-top: 8px;
+        }
+
+        .keypad-btn {
+            background: linear-gradient(145deg,#102b47,#081b30);
+            border: 1px solid rgba(197,164,93,.45);
+            border-radius: 8px;
+            color: #C5A45D;
+            font-family: 'Orbitron',sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            padding: 11px 5px;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .keypad-btn:hover {
+            background: linear-gradient(135deg,#C5A45D,#a8893e);
+            color: #061A36;
+            box-shadow: 0 0 14px rgba(197,164,93,.3);
+        }
+
+        .keypad-btn:active {
+            transform: scale(.94);
+        }
+
+        .keypad-clear {
+            color: #ff8a80;
+            border-color: rgba(229,57,53,.6);
+            font-size: .65rem;
+        }
+
+        .keypad-delete {
+            color: #ffffff;
+            border-color: rgba(255,255,255,.4);
+        }
+
+        .card-slot-wrap {
+            padding: 0 20px 20px;
+        }
+
+        .card-slot {
+            background: linear-gradient(90deg,#07111c,#0d1e2d,#07111c);
+            border: 1px solid rgba(18,63,105,.6);
+            border-radius: 6px;
+            padding: 10px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .card-slot-opening {
+            width: 48px;
+            height: 6px;
+            background: #030810;
+            border-radius: 2px;
+        }
+
+        .card-slot-text {
+            font-family: 'Orbitron',sans-serif;
+            font-size: .58rem;
+            color: rgba(197,164,93,.5);
+            letter-spacing: 2px;
+        }
+
+        .card-slot-arrow {
+            color: rgba(197,164,93,.45);
+        }
+
+        @media(max-width:520px) {
+            .atm-screen {
+                margin: 14px 12px;
+                padding: 18px 14px;
+            }
+
+            .screen-title {
+                font-size: 1.2rem;
+            }
+
+            .bank-name {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="atm-machine">
+
+    <!-- Header -->
+    <div class="atm-header">
+        <div class="bank-logo-wrap">
+            <div class="bank-logo-icon">
+                <i class="fas fa-landmark"></i>
+            </div>
+            <div class="bank-name">SECURE BANK</div>
+        </div>
+
+        <div class="bank-tagline">
+            Your Trusted Financial Partner
+        </div>
+    </div>
+
+    <!-- Status -->
+    <div class="atm-status-bar">
+        <div class="status-led">
+            <span class="led-dot"></span>
+            SYSTEM ONLINE
+        </div>
+
+        <div class="status-time" id="atm-clock">--:--</div>
+    </div>
+
+    <!-- Screen -->
+    <div class="atm-screen">
+
+        <div class="screen-title">WELCOME</div>
+        <div class="screen-subtitle">Please insert your card</div>
+        <div class="screen-divider"></div>
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert-atm alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Login form -->
+        <form action="/login" method="POST"
+              id="login-form"
+              autocomplete="off">
+
+            <!-- Card Number -->
+            <div>
+                <label for="card_number" class="atm-label">
+                    <i class="fas fa-credit-card"></i>
+                    Card Number
+                </label>
+
+                <div class="input-atm-wrap">
+                    <span class="input-icon">
+                        <i class="fas fa-credit-card"></i>
+                    </span>
+
+                    <input
+                        type="text"
+                        id="card_number"
+                        name="card_number"
+                        class="form-control-atm"
+                        placeholder="XXXX XXXX XXXX XXXX"
+                        maxlength="19"
+                        inputmode="numeric"
+                        autocomplete="off"
+                        required>
+                </div>
+            </div>
+
+            <!-- PIN -->
+            <div>
+                <label for="pin" class="atm-label">
+                    <i class="fas fa-lock"></i>
+                    Enter PIN
+                </label>
+
+                <div class="input-atm-wrap">
+                    <span class="input-icon">
+                        <i class="fas fa-key"></i>
+                    </span>
+
+                    <input
+                        type="password"
+                        id="pin"
+                        name="pin"
+                        class="form-control-atm"
+                        placeholder="ENTER 4 DIGIT PIN"
+                        maxlength="4"
+                        minlength="4"
+                        pattern="[0-9]{4}"
+                        inputmode="numeric"
+                        autocomplete="off"
+                        required>
+                </div>
+            </div>
+
+            <!-- ATM Keypad -->
+            <div class="keypad-title">
+                <i class="fas fa-th"></i>
+                ENTER PIN USING KEYPAD
+            </div>
+
+            <div class="atm-keypad">
+
+                <button type="button" class="keypad-btn" onclick="addPin('1')">1</button>
+                <button type="button" class="keypad-btn" onclick="addPin('2')">2</button>
+                <button type="button" class="keypad-btn" onclick="addPin('3')">3</button>
+
+                <button type="button" class="keypad-btn" onclick="addPin('4')">4</button>
+                <button type="button" class="keypad-btn" onclick="addPin('5')">5</button>
+                <button type="button" class="keypad-btn" onclick="addPin('6')">6</button>
+
+                <button type="button" class="keypad-btn" onclick="addPin('7')">7</button>
+                <button type="button" class="keypad-btn" onclick="addPin('8')">8</button>
+                <button type="button" class="keypad-btn" onclick="addPin('9')">9</button>
+
+                <button type="button"
+                        class="keypad-btn keypad-clear"
+                        onclick="clearPin()">
+                    CLEAR
+                </button>
+
+                <button type="button" class="keypad-btn" onclick="addPin('0')">0</button>
+
+                <button type="button"
+                        class="keypad-btn keypad-delete"
+                        onclick="deletePin()">
+                    <i class="fas fa-backspace"></i>
+                </button>
+
+            </div>
+
+            <!-- Buttons -->
+            <div class="btn-row">
+
+                <button type="submit"
+                        id="login-btn"
+                        class="btn-atm">
+                    <i class="fas fa-arrow-right"></i>
+                    PROCEED
+                </button>
+
+                <button type="button"
+                        class="btn-atm-secondary"
+                        onclick="clearAll()">
+                    <i class="fas fa-times"></i>
+                    CLEAR
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+    <!-- Card slot -->
+    <div class="card-slot-wrap">
+        <div class="card-slot">
+            <span class="card-slot-arrow">
+                <i class="fas fa-chevron-right"></i>
+            </span>
+
+            <div class="card-slot-opening"></div>
+
+            <span class="card-slot-text">Insert Card</span>
+
+            <span class="card-slot-arrow">
+                <i class="fas fa-chevron-right"></i>
+            </span>
+        </div>
+    </div>
+
+</div>
+
+<script>
+
+    // ATM Clock
+    function updateClock() {
+        const el = document.getElementById('atm-clock');
+
+        if (el) {
+            const now = new Date();
+
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+
+            el.textContent = h + ':' + m;
+        }
+    }
+
+    updateClock();
+    setInterval(updateClock, 15000);
+
+
+    // Card number formatter
+    const cardInput = document.getElementById('card_number');
+
+    cardInput.addEventListener('input', function () {
+
+        let raw = this.value.replace(/\D/g, '').substring(0, 16);
+
+        let formatted = raw.replace(/(.{4})(?=.)/g, '$1 ');
+
+        this.value = formatted;
+    });
+
+
+    // PIN only numbers
+    const pinInput = document.getElementById('pin');
+
+    pinInput.addEventListener('input', function () {
+
+        this.value = this.value.replace(/\D/g, '').substring(0, 4);
+
+    });
+
+
+    // Add PIN digit using virtual keypad
+    function addPin(number) {
+
+        const pin = document.getElementById('pin');
+
+        if (pin.value.length < 4) {
+            pin.value += number;
+        }
+    }
+
+
+    // Clear only PIN
+    function clearPin() {
+
+        document.getElementById('pin').value = '';
+
+    }
+
+
+    // Delete last PIN digit
+    function deletePin() {
+
+        const pin = document.getElementById('pin');
+
+        pin.value = pin.value.slice(0, -1);
+
+    }
+
+
+    // Clear all fields
+    function clearAll() {
+
+        document.getElementById('card_number').value = '';
+        document.getElementById('pin').value = '';
+
+        document.getElementById('card_number').focus();
+
+    }
+
+</script>
+
+</body>
+</html>
